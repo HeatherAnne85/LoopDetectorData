@@ -150,10 +150,9 @@ def calculate_flow_direction(input_df, aggregation, direction, width, order):
     
     return df
 
-
 def plot_speed_CDF(speed_dfs):
     #Paper figure 2 - left
-    df = pd.concat([speed_dfs['Promenade_in'], speed_dfs['Promenade_out']], ignore_index=True)
+    df = speed_dfs['Promenade']
     
     #observed data
     x,y = ECDF(df['speed'])
@@ -354,7 +353,7 @@ def plot_heatmap_together(df, direction, site, order, width, aggregation, max_fl
     else:
         opposite = 'in'
         
-    df = df[df[f'flow_{opposite}'] < max_flow]
+    df = df[df[f'flow_{opposite}'] <= max_flow]
     
     N = len(df['flow_'+direction].values)
     flow_direction_bins = range(0,3000,400)
@@ -397,12 +396,12 @@ def plot_heatmap_together(df, direction, site, order, width, aggregation, max_fl
 
 def combine_sublane1m(list_locs, lim):      
     ins = pd.concat(list_locs['in'])
-    ins = ins[ins['flow_out'] < lim]
+    ins = ins[ins['flow_out'] <= lim]
     dir_in = ins[['flow_in', 'D_sublane1_in', 'D_sublane2_in', 'D_sublane3_in', 'D_sublane4_in']]
     dir_in.rename(columns={'flow_in': 'flow', 'D_sublane1_in': 'D_sublane1', 'D_sublane2_in': 'D_sublane2', 'D_sublane3_in': 'D_sublane3', 'D_sublane4_in': 'D_sublane4'}, inplace=True)
     
     outs = pd.concat(list_locs['out'])
-    outs = outs[outs['flow_in'] < lim]
+    outs = outs[outs['flow_in'] <= lim]
     dir_out = outs[['flow_out', 'D_sublane1_out', 'D_sublane2_out', 'D_sublane3_out', 'D_sublane4_out']]
     dir_out.rename(columns={'flow_out': 'flow', 'D_sublane1_out': 'D_sublane1', 'D_sublane2_out': 'D_sublane2', 'D_sublane3_out': 'D_sublane3', 'D_sublane4_out': 'D_sublane4'}, inplace=True)
 

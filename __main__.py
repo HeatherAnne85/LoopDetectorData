@@ -32,7 +32,7 @@ def create_args():
     parser.add_argument('--site_heatmaps', default=True)  
     parser.add_argument('--combined_heatmap', default=True)  
     parser.add_argument('--line_of_best_fit', default=True)  
-    parser.add_argument('--min_speed', default=0,
+    parser.add_argument('--min_speed', default=7,
                         help='all speed recordings less than or equal to this value will be removed from the dataset'),
     parser.add_argument('--max_counterflow', default=500,
                         help='all time intervals with counterflow greater than this value will be removed from the dataset')    
