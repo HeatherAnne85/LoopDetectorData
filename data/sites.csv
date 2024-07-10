@@ -1,0 +1,8 @@
+﻿Site;in_left;in_center;in_right;out_left;out_center;out_right;directionality;loop_width ;total width
+Coesfelder Kreuz Stadtauswaerts;lane3;lane2;lane1;lane1;lane2;lane3;Bi-directional;100;300
+Gasselstiege;lane1;lane2;lane3;lane3;lane2;lane1;Bi-directional;120;360
+Grevener Str. Auswaerts;lane3;lane2;lane1;lane1;lane2;lane3;;95;
+Grevener Str. Einwaerts;lane1;lane2;lane3;lane3;lane2;lane1;;95;
+Kanalpromenade Abschnitt 6;lane3;lane2;lane1;lane1;lane2;lane3;Bi-directional;120;360
+Kanalpromenade Dingstiege;lane3;lane2;lane1;lane1;lane2;lane3;Bi-directional;147;440
+Promenade;lane1;lane2;lane3;lane3;lane2;lane1;Bi-directional;140;420
