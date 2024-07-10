@@ -347,14 +347,14 @@ def plot_scatter_speed_flow_lane(obs_x, obs_y):
     plt.show()
     return    
     
-def plot_heatmap_together(df, direction, site, order, width, aggregation):
+def plot_heatmap_together(df, direction, site, order, width, aggregation, max_flow):
     #Paper figure 5
     if direction == 'in':
         opposite = 'out'
     else:
         opposite = 'in'
         
-    df = df[df[f'flow_{opposite}'] < 500]
+    df = df[df[f'flow_{opposite}'] < max_flow]
     
     N = len(df['flow_'+direction].values)
     flow_direction_bins = range(0,3000,400)
