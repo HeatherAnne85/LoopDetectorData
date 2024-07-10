@@ -6,5 +6,15 @@ The analysis are published in the following paper:
 Please cite the paper if you use the code or data. 
 
 Analyses:
-We are interested in the flow characteristics of bicycle traffic and define the following parameters for the entire cross-section and each inductive loop independently.
-  $\overline(q_l) = N_{l}/T$
+We are interested in the flow characteristics of bicycle traffic and define the following parameters for the entire cross-section and each inductive loop independently. First, the number of cyclists $N_l$ crossing each inductive loops $l$ in a given time interval $T$ is determined. The average bicycle traffic flow $overline{q_l}$ passing inductive loop $l$ during the time interval $T$ is calculated. The harmonic mean of the speeds $overline{v_l}$ of all cyclists $i$ that pass loop $l$ in time interval $T$ is calculated. The average density $overline{k_l}$ at inductive loop $l$ is derived from the average speed $overline{v_l}$ and the average flow $overline{q_l}$ and the width of the inductive loop $w_l$. The total number of cyclists detected over the entire cross-section N is the sum across all loops. 
+
+  $\overline{q_l)} = N_{l}/T$
+
+  $overline{v_l} = N_{l} (∑_{i=0}^{N_l} v_{i,l}^{-1} )^{-1}	
+
+(k_l ) ̅=(q_l ) ̅/((v_l ) ̅*w_l )	Eq. 3
+
+N=∑_(l=1)^3▒N_l 	Eq. 4
+
+
+The corresponding parameters across the entire cross-section, q ̅, v ̅ and k ̅ are calculated using N, v_i, the speed of all cyclists, and w, the total width of the bicycle path. 
