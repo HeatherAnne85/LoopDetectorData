@@ -7,4 +7,4 @@ Please cite the paper if you use the code or data.
 
 Analyses:
 We are interested in the flow characteristics of bicycle traffic and define the following parameters for the entire cross-section and each inductive loop independently.
-  (q_l ) ̅=N_l/T
+  $\overline(q_l) = N_{l}/T$
