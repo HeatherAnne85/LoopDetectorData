@@ -7,7 +7,7 @@ author: Heather Kaths
 
 import argparse
 import pandas as pd
-import LoopDetectorFunctions as LDF
+import LoopDetectorData as LDF
 
 
 # Parameters
@@ -16,9 +16,9 @@ def create_args():
                                  description = 'investigating bicycle traffic flow using loop detector data')
     parser.add_argument('--directory', default="./data",
                         help='Path to the directory that contains the raw data from inductive loop detectors')
-    parser.add_argument('--sensor_dict', default='30S',
+    parser.add_argument('--time_int', default='30S',
                         help='Duration of time intervals used to analyse flow data')    
-    parser.add_argument('--time_int', default={'Gasselstiege':'Gassels',
+    parser.add_argument('--sensor_dict', default={'Gasselstiege':'Gassels',
                                                'Kanalpromenade Abschnitt 6':'KnlPro6',
                                                'Kanalpromenade Dingstiege':'KnlProD',
                                                'Promenade':'Promenade'},
@@ -34,18 +34,19 @@ def create_args():
     parser.add_argument('--line_of_best_fit', default=True)  
     parser.add_argument('--min_speed', default=0,
                         help='all speed recordings less than or equal to this value will be removed from the dataset'),
-    parser.add_argument('--max_counterflow', default=0,
+    parser.add_argument('--max_counterflow', default=500,
                         help='all time intervals with counterflow greater than this value will be removed from the dataset')    
     return vars(parser.parse_args())
 
 
 def load_data(config):
     sensor_data = {}
+    directory = config['directory']
     for sensor in config['sensor_dict'].keys():
         print(sensor)
-        df1 = pd.read_csv(f'Full Data/{sensor}.csv', sep=';')
+        df1 = pd.read_csv(f'{directory}/May_Data/{sensor}.csv', sep=';')
         df1['timestamp'] = pd.to_datetime(df1['timestamp'], format='mixed')
-        df2 = pd.read_csv(f'June Data/{sensor}.csv', sep=';')
+        df2 = pd.read_csv(f'{directory}/June_Data/{sensor}.csv', sep=';')
         df2['timestamp'] = pd.to_datetime(df2['timestamp'], format='mixed')
         df = pd.concat([df1, df2], ignore_index=True)
         df, l2 = LDF.remove_slow(df, config['min_speed'])
@@ -56,7 +57,7 @@ def load_data(config):
 def run_analyses(data, config):
     aggregation = config['time_int']
     loop_info = pd.read_csv(config['loop_info'], sep=';')
-    
+    directory = config['directory']
     if config['scatter_speed_flow']:
         obs_x, obs_y, all_obs_x, all_obs_y = [],[],[],[]
     if config['scatter_density_flow']:
@@ -70,7 +71,8 @@ def run_analyses(data, config):
         orders = LDF.get_order(loop_info, key)  
         df = data[value]
         try:
-            flows = pd.read_csv(config['directory']+value+aggregation+'.csv', sep=',')
+            flows = pd.read_csv(f'{directory}/flow_data/{value}{aggregation}.csv', sep=',')
+            print(f'{value} loaded')
         except:
             flows = LDF.get_flow(value, aggregation, config['directory'], df, width, orders)
         
