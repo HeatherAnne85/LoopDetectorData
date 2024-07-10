@@ -10,11 +10,10 @@ We are interested in the flow characteristics of bicycle traffic and define the 
 
   $\overline{q_l)} = N_{l}/T$
 
-  $\overline{v_l} = N_{l} (∑_{i=0}^{N_l} v_{i,l}^{-1} )^{-1}$	
+  $\overline{v_l} = N_{l} \left( \sum_{i=0}^{N_l} v_{i,l}^{-1} \right)^{-1}$
 
-(k_l ) ̅=(q_l ) ̅/((v_l ) ̅*w_l )	Eq. 3
+  $\overline{k_l} = \frac{\overline{q_l}}{\overline{v_l} \cdot w_l}$
 
-N=∑_(l=1)^3▒N_l 	Eq. 4
+  $N = \sum_{l=1}^3 N_l$
 
-
-The corresponding parameters across the entire cross-section, q ̅, v ̅ and k ̅ are calculated using N, v_i, the speed of all cyclists, and w, the total width of the bicycle path. 
+The corresponding parameters across the entire cross-section, $\overline{q}$, $\overline{v}$ and $\overline{k}$ are calculated using $N$, $v_i$, the speed of all cyclists, and $w$, the total width of the bicycle path. 
