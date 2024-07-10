@@ -25,14 +25,17 @@ def create_args():
                         help='Long and short labels for the sites.')
     parser.add_argument('--loop_info', default="./data/sites.csv",
                         help='information about the width and order of the inductive loops for each direction')  
-    parser.add_argument('CDF_brandenburg/observations', default=True)      
-    parser.add_argument('CDF_all_sites', default=True)  
-    parser.add_argument('scatter_speed_flow', default=True)  
-    parser.add_argument('scatter_density_flow', default=True)  
-    parser.add_argument('site_heatmaps', default=True)  
-    parser.add_argument('combined_heatmap', default=True)  
-    parser.add_argument('line_of_best_fit', default=True)  
-    
+    parser.add_argument('--CDF_brandenburg/observations', default=True)      
+    parser.add_argument('--CDF_all_sites', default=True)  
+    parser.add_argument('--scatter_speed_flow', default=True)  
+    parser.add_argument('--scatter_density_flow', default=True)  
+    parser.add_argument('--site_heatmaps', default=True)  
+    parser.add_argument('--combined_heatmap', default=True)  
+    parser.add_argument('--line_of_best_fit', default=True)  
+    parser.add_argument('--min_speed', default=0,
+                        help='all speed recordings less than or equal to this value will be removed from the dataset'),
+    parser.add_argument('--max_counterflow', default=0,
+                        help='all time intervals with counterflow greater than this value will be removed from the dataset')    
     return vars(parser.parse_args())
 
 
@@ -45,7 +48,7 @@ def load_data(config):
         df2 = pd.read_csv(f'June Data/{sensor}.csv', sep=';')
         df2['timestamp'] = pd.to_datetime(df2['timestamp'], format='mixed')
         df = pd.concat([df1, df2], ignore_index=True)
-        df, l2 = LDF.remove_slow(df, 0)
+        df, l2 = LDF.remove_slow(df, config['min_speed'])
         sensor_data[config['sensor_dict'][sensor]] = df    
     return sensor_data
 
@@ -86,7 +89,7 @@ def run_analyses(data, config):
                 all_obs_x_den.append(all_x_fs_den)
                 all_obs_y_den.append(all_y_fs_den)
             if config['site_heatmaps']:
-                LDF.plot_heatmap_together(flows, direction, value+aggregation, order, width, aggregation)
+                LDF.plot_heatmap_together(flows, direction, value+aggregation, order, width, aggregation, config['max_counterflow'])
             if config['combined_heatmap'] or config['line_of_best_fit']:
                 list_sublane_densities[direction].append(LDF.get_dataframe_sublane_1m_densities(flows, direction, order, width))
     
@@ -101,7 +104,7 @@ def run_analyses(data, config):
         LDF.plot_scatter_density_flow_lane(obs_x_den, obs_y_den)
         LDF.plot_scatter_density_flow(all_obs_x_den, all_obs_y_den)
     if config['combined_heatmap'] or config['line_of_best_fit']:
-        means, stds, N = LDF.combine_sublane1m(list_sublane_densities, 500)
+        means, stds, N = LDF.combine_sublane1m(list_sublane_densities, config['max_counterflow'])
         if config['combined_heatmap']:
             LDF.heatmap_sublanes_densities(means, 70, 'mean', N)
             LDF.heatmap_sublanes_densities(stds, 20, "std. dev.", N)
