@@ -10,7 +10,7 @@ We are interested in the flow characteristics of bicycle traffic and define the 
 
   $\overline{q_l} = N_{l}/T$
 
-  $\overline{v_l} = N_{l} \left( {\sum_{i=0}}^{N_l} v_{i,l}^{-1} \right)^{-1}$
+  &#772;v<sub>l</sub> = N<sub>l</sub> (∑<sub>i=0</sub><sup>N<sub>l</sub></sup> v<sub>i,l</sub><sup>-1</sup> )<sup>-1</sup>
 
   $\overline{k_l} = \frac{\overline{q_l}}{\overline{v_l} \cdot w_l}$
 
