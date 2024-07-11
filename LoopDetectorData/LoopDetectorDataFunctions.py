@@ -76,7 +76,7 @@ def get_flow(site, aggregation, directory, df, width, orders):
     df_in = calculate_flow_direction(df, aggregation, 'in', width, orders['in'])
     df_out = calculate_flow_direction(df, aggregation, 'out', width, orders['out'])
     flows =  pd.concat([df_in, df_out], axis=1)   
-    flows.to_csv(directory+site+aggregation+'.csv', index=False)
+    
     return flows
 
 def get_dataframe_sublane_1m_densities(data, direction, order, loop_width):
@@ -202,10 +202,18 @@ def plot_speed_CDF_multiple(speed_dfs, location_list):
     plt.show()
     return
 
-def collect_observations_lane(df_org, right, intersection, direction, label): 
+def collect_observations_lane(df_org, right, intersection, direction, label, max_flow): 
     labs = ['inductive loop 3', 'inductive loop 2', 'inductive loop 1']
     obs_x = {}
     obs_y = {}
+    
+    if label == 'density/m':
+        if direction == 'in':
+            opposite = 'out'
+        else:
+            opposite = 'in'
+            
+        df_org = df_org[df_org[f'flow_{opposite}'] <= max_flow]
     
     df = df_org
     df = df.dropna(subset=[f'{label}_{direction}', f'flow_{direction}'])
