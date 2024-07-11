@@ -111,7 +111,7 @@ def run_analyses(data, config):
         means, stds, N = LDF.combine_sublane1m(list_sublane_densities, config['max_counterflow'])
         if config['combined_heatmap']:
             LDF.heatmap_sublanes_densities(means, 70, 'mean', N)
-            LDF.heatmap_sublanes_densities(stds, 20, "std. dev.", N)
+            LDF.heatmap_sublanes_densities(stds, 30, "std. dev.", N)
         if config['line_of_best_fit']:
             LDF.lines_of_best_fit(means, [10,20,30,40], r'density $\overline{k_l}$ [bicycles/km/m]')
     return

@@ -165,7 +165,7 @@ def plot_speed_CDF(speed_dfs):
     x_b = np.insert(x_b, 0, x_b[0])
     y_b = np.insert(y_b, 0, 0.)  
     
-    plt.figure(figsize=(8, 6), dpi=300)
+    plt.figure(figsize=(7, 6), dpi=300)
     plt.step(x, y, where='post', color='black', label='Observations at Promenade site')
     plt.plot(x_b, y_b, color='black', linestyle='--', label='Speed distribution from Brandenburg et al. (11)')
     
@@ -183,7 +183,7 @@ def plot_speed_CDF_multiple(speed_dfs, location_list):
     #Paper figure 2 - right
     line_styles = ['-', '--', '-.', ':', (0, (3, 1, 1, 1))]
     labels = ['Gasselstiege','Kanalpromenade A','Kanalpromenade B','Promenade']
-    plt.figure(figsize=(8, 6), dpi=300)
+    plt.figure(figsize=(7, 6), dpi=300)
     
     for i, location in enumerate(location_list):
         df = speed_dfs[location]
@@ -364,7 +364,7 @@ def plot_heatmap_together(df, direction, site, order, width, aggregation, max_fl
     df = df[df[f'flow_{opposite}'] <= max_flow]
     
     N = len(df['flow_'+direction].values)
-    flow_direction_bins = range(0,3000,400)
+    flow_direction_bins = range(0,2600,400)
     df['flow_direction_bin'] = pd.cut(df['flow_'+direction], bins=flow_direction_bins, right=False)
     grouped = df.groupby('flow_direction_bin')
     filtered_grouped = grouped.filter(lambda x: len(x) >= 5)
@@ -417,7 +417,7 @@ def combine_sublane1m(list_locs, lim):
     
     N = len(df['flow'].values)
 
-    flow_direction_bins = range(0,3000,400)
+    flow_direction_bins = range(0,2600,400)
     df['flow_direction_bin'] = pd.cut(df['flow'], bins=flow_direction_bins, right=False)
     
     grouped = df.groupby('flow_direction_bin')
