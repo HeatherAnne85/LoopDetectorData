@@ -203,17 +203,17 @@ def plot_speed_CDF_multiple(speed_dfs, location_list):
     return
 
 def collect_observations_lane(df_org, right, intersection, direction, label, max_flow): 
-    labs = ['inductive loop 3', 'inductive loop 2', 'inductive loop 1']
+    labs = ['inductive loop - left', 'inductive loop - center', 'inductive loop 1 - right']
     obs_x = {}
     obs_y = {}
     
-    if label == 'density/m':
-        if direction == 'in':
-            opposite = 'out'
-        else:
-            opposite = 'in'
-            
-        df_org = df_org[df_org[f'flow_{opposite}'] <= max_flow]
+    #if label == 'density/m':
+    if direction == 'in':
+        opposite = 'out'
+    else:
+        opposite = 'in'
+        
+    df_org = df_org[df_org[f'flow_{opposite}'] <= max_flow]
     
     df = df_org
     df = df.dropna(subset=[f'{label}_{direction}', f'flow_{direction}'])
@@ -261,7 +261,7 @@ def plot_scatter_density_flow(obs_x, obs_y):
            
 def plot_scatter_density_flow_lane(obs_x, obs_y):  
     #Paper figure 4 - right
-    labs = ['inductive loop 1', 'inductive loop 2', 'inductive loop 3']
+    labs = ['inductive loop - right', 'inductive loop - center', 'inductive loop - left']
     marker_styles = ['D','s','o']
     line_styles = ['-',':',(0, (3, 10, 1, 1))]
     colors = ['midnightblue', 'darkorange', 'teal']
@@ -323,7 +323,7 @@ def plot_scatter_speed_flow(obs_x, obs_y):
 
 def plot_scatter_speed_flow_lane(obs_x, obs_y):
     #Paper figure 3 - right
-    labs = ['inductive loop 1', 'inductive loop 2', 'inductive loop 3']
+    labs = ['inductive loop - right', 'inductive loop - center', 'inductive loop - left']
     marker_styles = ['D','s','o']
     line_styles = ['-',':',(0, (3, 10, 1, 1))]
     colors = ['midnightblue', 'darkorange', 'teal']
@@ -389,7 +389,7 @@ def plot_heatmap_together(df, direction, site, order, width, aggregation, max_fl
     ax2 = ax.twinx() 
     ax2.set_ylim(0, width*3) 
     ax2.set_yticks([0, width, 2*width, width*3])  
-    ax2.set_yticklabels(['0', str(round(width,1)),str(round(2*width)), str(round(width*3,1))])  
+    ax2.set_yticklabels(['0', str(round(width,1)),str(round(2*width,1)), str(round(width*3,1))])  
     ax2.yaxis.set_ticks_position('left')
     ax2.yaxis.set_label_position('left')
     ax2.set_ylabel('width [m]')

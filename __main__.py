@@ -25,11 +25,11 @@ def create_args():
                         help='Long and short labels for the sites.')
     parser.add_argument('--loop_info', default="./data/sites.csv",
                         help='information about the width and order of the inductive loops for each direction')  
-    parser.add_argument('--CDF_brandenburg/observations', default=True)      
-    parser.add_argument('--CDF_all_sites', default=True)  
+    parser.add_argument('--CDF_brandenburg/observations', default=False)      
+    parser.add_argument('--CDF_all_sites', default=False)  
     parser.add_argument('--scatter_speed_flow', default=True)  
     parser.add_argument('--scatter_density_flow', default=True)  
-    parser.add_argument('--site_heatmaps', default=True)  
+    parser.add_argument('--site_heatmaps', default=False)  
     parser.add_argument('--combined_heatmap', default=True)  
     parser.add_argument('--line_of_best_fit', default=True)  
     parser.add_argument('--min_speed', default=6,
