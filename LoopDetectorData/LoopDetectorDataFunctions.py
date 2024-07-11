@@ -506,7 +506,7 @@ def lines_of_best_fit(df, values, label):
     
     ax.set_yticks([0.5, 1, 2, 3, 4, 4.5])
     ax.set_yticklabels(['','1', '2', '3', '4', ''])
-    ax.set_xlim(-100, 6000)
+    ax.set_xlim(-100, 5000)
     ax.set_xlabel('flow $\overline{q}$ [bicycles/h]')
     ax.set_ylabel('width [m]')
     ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), title=r'density $\overline{k_{sl}}$') # , bbox_to_anchor=(1, 0.5)
