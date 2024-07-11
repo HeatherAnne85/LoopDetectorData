@@ -203,7 +203,7 @@ def plot_speed_CDF_multiple(speed_dfs, location_list):
     return
 
 def collect_observations_lane(df_org, right, intersection, direction, label, max_flow): 
-    labs = ['inductive loop - left', 'inductive loop - center', 'inductive loop 1 - right']
+    labs = ['inductive loop left', 'inductive loop center', 'inductive loop right']
     obs_x = {}
     obs_y = {}
     
@@ -261,7 +261,7 @@ def plot_scatter_density_flow(obs_x, obs_y):
            
 def plot_scatter_density_flow_lane(obs_x, obs_y):  
     #Paper figure 4 - right
-    labs = ['inductive loop - right', 'inductive loop - center', 'inductive loop - left']
+    labs = ['inductive loop right', 'inductive loop center', 'inductive loop left']
     marker_styles = ['D','s','o']
     line_styles = ['-',':',(0, (3, 10, 1, 1))]
     colors = ['midnightblue', 'darkorange', 'teal']
@@ -323,7 +323,7 @@ def plot_scatter_speed_flow(obs_x, obs_y):
 
 def plot_scatter_speed_flow_lane(obs_x, obs_y):
     #Paper figure 3 - right
-    labs = ['inductive loop - right', 'inductive loop - center', 'inductive loop - left']
+    labs = ['inductive loop right', 'inductive loop center', 'inductive loop left']
     marker_styles = ['D','s','o']
     line_styles = ['-',':',(0, (3, 10, 1, 1))]
     colors = ['midnightblue', 'darkorange', 'teal']
