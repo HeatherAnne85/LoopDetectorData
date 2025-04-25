@@ -10,6 +10,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.colors import Normalize
 from sklearn.linear_model import LinearRegression
+from sklearn.metrics import r2_score
 from scipy.interpolate import interp1d 
 import warnings
 warnings.filterwarnings('ignore')
@@ -151,7 +152,7 @@ def calculate_flow_direction(input_df, aggregation, direction, width, order):
     return df
 
 def plot_speed_CDF(speed_dfs):
-    #Paper figure 2 - left
+    #Paper figure 2 - A
     df = speed_dfs['Promenade']
     
     #observed data
@@ -166,21 +167,21 @@ def plot_speed_CDF(speed_dfs):
     y_b = np.insert(y_b, 0, 0.)  
     
     plt.figure(figsize=(7, 6), dpi=300)
-    plt.step(x, y, where='post', color='black', label='Observations at Promenade site')
-    plt.plot(x_b, y_b, color='black', linestyle='--', label='Speed distribution from Brandenburg et al. (11)')
+    plt.step(x, y, where='post', color='black', label='Promenade')
+    plt.plot(x_b, y_b, color='black', linestyle='--', label='Brandenburg et al.')
     
-    legend = plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=1)
+    legend = plt.legend(loc='lower right')
     legend.get_frame().set_edgecolor('none')
     plt.xlim(5, 35)
     plt.xlabel('speed [km/h]')
     plt.ylabel('cumulative probability')
-    plt.grid(True)
     plt.tight_layout()
+    plt.savefig('figures/Figure_2_A.png', dpi=300, bbox_inches='tight')
     plt.show()
     return
 
 def plot_speed_CDF_multiple(speed_dfs, location_list):
-    #Paper figure 2 - right
+    #Paper figure 2 - B
     line_styles = ['-', '--', '-.', ':', (0, (3, 1, 1, 1))]
     labels = ['Gasselstiege','Kanalpromenade A','Kanalpromenade B','Promenade']
     plt.figure(figsize=(7, 6), dpi=300)
@@ -192,13 +193,15 @@ def plot_speed_CDF_multiple(speed_dfs, location_list):
         y = np.insert(y, 0, 0.)
         plt.step(x, y, where='post', linestyle = line_styles[i], color='black', label=f'{labels[i]}')
     
-    legend = plt.legend(loc='upper center', bbox_to_anchor=(0.5, -0.15), ncol=2)
+    legend = plt.legend(loc='upper left')
     legend.get_frame().set_edgecolor('none')
+    legend.get_frame().set_facecolor('none') 
+
     plt.xlim(5, 35)
     plt.xlabel('speed [km/h]')
     plt.ylabel('cumulative probability')
-    plt.grid(True)
     plt.tight_layout()
+    plt.savefig('figures/Figure_2_B.png', dpi=300, bbox_inches='tight')
     plt.show()
     return
 
@@ -233,7 +236,7 @@ def collect_observations_lane(df_org, right, intersection, direction, label, max
 
 
 def plot_scatter_density_flow(obs_x, obs_y):
-    #Paper figure 4 - left
+    #Paper figure 5 - A
     x = []
     y = []
     for i, intersection in enumerate(obs_x):  
@@ -247,30 +250,34 @@ def plot_scatter_density_flow(obs_x, obs_y):
     model.fit(x, y)
     trendline = model.predict(x)
     
+    jitter_amount = 15 
+    x_jittered = x.flatten() + np.random.normal(0, jitter_amount, len(x))  
+    
     plt.figure(figsize=(7, 6), dpi=300)
-    plt.scatter(x, y, s=1, color="black")
-    plt.plot(x, trendline, color='black')
+    plt.scatter(x_jittered, y, s=1, color='black') 
+    plt.plot(x, trendline, color='white', linewidth=2.7)
+    plt.plot(x, trendline, color='black', linewidth=2.0)
         
     plt.xlim(0, 3000)
-    plt.ylim(0, 70)
-    plt.xlabel('flow $\overline{q}$ [bicycles/h]')
-    plt.ylabel('density $\overline{k}$ [bicycles/km/m]')
-    plt.grid(True)
+    plt.ylim(-2, 70)
+    plt.xlabel('$q$ [bicycles/h]')
+    plt.ylabel('$k$ [bicycles/km/m]')
+    plt.text(50, 65, f'n = {len(x.flatten())}', color='black', bbox=dict(facecolor='white', edgecolor='white', boxstyle='square, pad=0.2'))
+    plt.savefig('figures/Figure_5_A.png', dpi=300, bbox_inches='tight')
     plt.show()
     return  
            
 def plot_scatter_density_flow_lane(obs_x, obs_y):  
-    #Paper figure 4 - right
+    #Paper figure 5 - B, C, and D
     labs = ['inductive loop right', 'inductive loop center', 'inductive loop left']
-    marker_styles = ['D','s','o']
-    line_styles = ['-',':',(0, (3, 10, 1, 1))]
-    colors = ['midnightblue', 'darkorange', 'teal']
+    labs_short = ['right', 'center', 'left']
+    fig_lab = ['B', 'C', 'D']
 
-    plt.figure(figsize=(7, 6), dpi=300)
     for lane in [0, 1, 2]:
+        plt.figure(figsize=(7, 6), dpi=300)
         x = []
         y = []
-        for i, intersection in enumerate(obs_x):  
+        for i, intersection in enumerate(obs_x):
             x.extend(obs_x[i][labs[lane]])
             y.extend(obs_y[i][labs[lane]])
         
@@ -281,20 +288,55 @@ def plot_scatter_density_flow_lane(obs_x, obs_y):
         model.fit(x, y)
         trendline = model.predict(x)
         
-        plt.scatter(x, y, s=1, marker=marker_styles[lane], color=colors[lane])
-        plt.plot(x, trendline, label=f'{labs[lane]}', linestyle=line_styles[lane], color=colors[lane])
+        jitter_amount = 15 
+        x_jittered = x.flatten() + np.random.normal(0, jitter_amount, len(x))  
         
-    plt.xlim(0, 3000)
-    plt.ylim(0, 70)
-    plt.xlabel('flow $\overline{q}$ [bicycles/h]')
-    plt.ylabel('density $\overline{k_l}$ [bicycles/km/m]')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
+        plt.scatter(x_jittered, y, s=1, color='black')
+        plt.plot(x, trendline, color='white', linewidth=2.7)
+        plt.plot(x, trendline, color='black', linewidth=2.0)
+        
+        plt.xlim(0, 3000)
+        plt.ylim(-2, 70)
+        plt.xlabel('$q$ [bicycles/h]')
+        plt.ylabel(r'$k_{' + labs_short[lane] + r'}$ [bicycles/km/m]')
+        plt.text(50, 65, f'n = {len(x.flatten())}', color='black', bbox=dict(facecolor='white', edgecolor='white', boxstyle='square, pad=0.2'))
+        plt.savefig(f'figures/Figure_5_{fig_lab[lane]}.png', dpi=300, bbox_inches='tight')
+        plt.show()
+    
     return    
 
+def fit_linear_models(x,y,split):
+    mask = x < split  
+    x1 = x[mask]
+    y1 = y[mask]
+    x2 = x[~mask]
+    y2 = y[~mask]
+    
+    if len(y1) == 0:
+        model = LinearRegression(fit_intercept=False)
+        model.fit(x2.reshape(-1, 1), y2)      
+        y2_fit = model.predict(x2.reshape(-1, 1))
+        return y2_fit      
+    
+    y1_median = np.mean(y1)
+    y1_fit = np.full_like(x1, y1_median)  # Create a horizontal line based on the median value    
+    
+    if len(y2) == 0:
+        return y1_fit
+    
+    X_prime = x2 - split
+    X_prime = X_prime.reshape(-1, 1)
+    Y_prime = y2 - y1_median
+    model = LinearRegression(fit_intercept=False)
+    model.fit(X_prime, Y_prime) 
+    y2_fit = model.predict(X_prime)+y1_median
+    
+    y_piecewise_fit = np.concatenate((y1_fit, y2_fit))
+
+    return y_piecewise_fit
+    
 def plot_scatter_speed_flow(obs_x, obs_y):
-    #Paper figure 3 - left
+    #Paper figure 4 - A
     x = []
     y = []
     
@@ -302,57 +344,87 @@ def plot_scatter_speed_flow(obs_x, obs_y):
         x.extend(obs_x[i])
         y.extend(obs_y[i])
     
-    x = np.array(x).reshape(-1, 1)
+    x = np.array(x).flatten()
     y = np.array(y)
-           
-    model = LinearRegression(fit_intercept=True)
-    model.fit(x, y)
-    trendline = model.predict(x)
+    
+    sorted_indices = np.argsort(x)
+    x = x[sorted_indices]
+    y = y[sorted_indices]
+    
+    r2s = []
+    
+    for split in range(360, 2000, 120):   
+        y_fit = fit_linear_models(x,y,split)
+        r2s.append(r2_score(y, y_fit))
+
+    split = range(360, 2000, 120)[r2s.index(max(r2s))]
+    y_fit = fit_linear_models(x,y,split)           
+    
+    jitter_amount = 15 
+    x_jittered = x + np.random.normal(0, jitter_amount, len(x))    
     
     plt.figure(figsize=(7, 6), dpi=300)
-    plt.scatter(x, y, s=1, color="black")
-    plt.plot(x, trendline, color='black')
+    plt.scatter(x_jittered, y, s=1, color="black")
+    plt.plot(x, y_fit, color='white', linewidth=2.7)
+    plt.plot(x, y_fit, color='black', linewidth=2)
         
     plt.xlim(0, 3000)
     plt.ylim(5, 35)
-    plt.xlabel('flow $\overline{q}$ [bicycles/h]')
-    plt.ylabel('speed $\overline{v}$ [km/h]')
-    plt.grid(True)
+    plt.xlabel('$q$ [bicycles/h]')
+    plt.ylabel('$\overline{v}$ [km/h]')
+    plt.text(2250, 33, f'n = {len(x)}', color='black', bbox=dict(facecolor='white', edgecolor='white', boxstyle='square, pad=0.2'))
+    plt.savefig('figures/Figure_4_A.png', dpi=300, bbox_inches='tight')
     plt.show()
-    return    
-
+    return 
+     
 def plot_scatter_speed_flow_lane(obs_x, obs_y):
-    #Paper figure 3 - right
+    # Paper figure 4 - B, C, D
     labs = ['inductive loop right', 'inductive loop center', 'inductive loop left']
-    marker_styles = ['D','s','o']
-    line_styles = ['-',':',(0, (3, 10, 1, 1))]
-    colors = ['midnightblue', 'darkorange', 'teal']
-    
-    plt.figure(figsize=(7, 6), dpi=300)
+    labs_short = ['right', 'center', 'left']
+    fig_lab = ['B', 'C', 'D']
+
     for lane in [0, 1, 2]:
+        r2s = []
+            
         x, y = [], []
-        for i, intersection in enumerate(obs_x):  
+        for i, intersection in enumerate(obs_x):
             x.extend(obs_x[i][labs[lane]])
             y.extend(obs_y[i][labs[lane]])
-        
-        x = np.array(x).reshape(-1, 1)
+
+        x = np.array(x).flatten()  # Ensure x is 1D
         y = np.array(y)
- 
-        model = LinearRegression(fit_intercept=True)
-        model.fit(x, y)
-        trendline = model.predict(x)
+
+        sorted_indices = np.argsort(x)
+        x = x[sorted_indices]
+        y = y[sorted_indices]
         
-        plt.scatter(x, y, s=1, marker=marker_styles[lane], color=colors[lane])
-        plt.plot(x, trendline, label=f'{labs[lane]}', linestyle=line_styles[lane], color=colors[lane])
+        for split in range(0, 2000, 120):   
+            y_fit = fit_linear_models(x,y,split)
+            r2s.append(r2_score(y, y_fit))
+    
+        # Plotting best fit
+        split = range(0, 2000, 120)[r2s.index(max(r2s))]
+        y_fit = fit_linear_models(x,y,split)
+        plt.figure(figsize=(7, 6), dpi=300)
+        print(f"lane {labs[lane]}\n: split = {split}, r2 = {max(r2s):.5f}")
         
-    plt.xlim(0, 3000)
-    plt.ylim(5, 35)
-    plt.xlabel('flow $\overline{q}$ [bicycles/h]')
-    plt.ylabel('speed $\overline{v_l}$ [km/h]')
-    plt.legend()
-    plt.grid(True)
-    plt.show()
-    return    
+        jitter_amount = 15 
+        x_jittered = x + np.random.normal(0, jitter_amount, len(x))
+        
+        plt.scatter(x_jittered, y, s=1, color='black')
+        plt.plot(x, y_fit, color='white', linewidth=2.7)
+        plt.plot(x, y_fit, color='black', linewidth=2)
+
+        plt.xlim(0, 3000)
+        plt.ylim(5, 35)
+        plt.xlabel('$q$ [bicycles/h]')
+        plt.ylabel(r'$\overline{v}_{' + labs_short[lane] + r'}$ [km/h]')
+        plt.text(2250, 33, f'n = {len(x)}', color='black', bbox=dict(facecolor='white', edgecolor='white', boxstyle='square, pad=0.2'))
+        plt.savefig(f'figures/Figure_4_{fig_lab[lane]}.png', dpi=300, bbox_inches='tight')
+        plt.show()
+
+    return
+
     
 def plot_heatmap_together(df, direction, site, order, width, aggregation, max_flow):
     #Paper figure 5
@@ -364,7 +436,7 @@ def plot_heatmap_together(df, direction, site, order, width, aggregation, max_fl
     df = df[df[f'flow_{opposite}'] <= max_flow]
     
     N = len(df['flow_'+direction].values)
-    flow_direction_bins = range(0,2600,400)
+    flow_direction_bins = range(0,2880,480)
     df['flow_direction_bin'] = pd.cut(df['flow_'+direction], bins=flow_direction_bins, right=False)
     grouped = df.groupby('flow_direction_bin')
     filtered_grouped = grouped.filter(lambda x: len(x) >= 5)
@@ -376,13 +448,13 @@ def plot_heatmap_together(df, direction, site, order, width, aggregation, max_fl
     fig, ax = plt.subplots(figsize=(7, 4))
     norm = Normalize(vmin=0, vmax=70)
     cax = ax.matshow(heatmap_data, cmap='jet', aspect='auto', norm=norm)
-    fig.colorbar(cax, label=r'mean $\overline{k_l}$ [bicycles/km/m]')
+    fig.colorbar(cax, label=r'$\overline{k_l}$ [bicycles/km/m]')
     
     ax.set_xticks([x + 0.48 for x in range(heatmap_data.shape[1])])
     ax.set_xticklabels(x_labs, rotation=0)
     ax.xaxis.set_ticks_position('bottom')
     ax.xaxis.set_label_position('bottom')
-    ax.set_xlabel('flow $\overline{q}$ [bicycles/h]')
+    ax.set_xlabel('$q$ [bicycles/h]')
     ax.invert_yaxis()
     ax.yaxis.set_visible(False)
 
@@ -392,12 +464,16 @@ def plot_heatmap_together(df, direction, site, order, width, aggregation, max_fl
     ax2.set_yticklabels(['0', str(round(width,1)),str(round(2*width,1)), str(round(width*3,1))])  
     ax2.yaxis.set_ticks_position('left')
     ax2.yaxis.set_label_position('left')
-    ax2.set_ylabel('width [m]')
-    
+    ax2.set_ylabel('distance from right edge [m]')
+    ax2.text(-1, width / 2, 'right\nloop', rotation=90, va='center', fontsize=16)
+    ax2.text(-1, 1.5 * width, 'center\nloop', rotation=90, va='center', fontsize=16)
+    ax2.text(-1, 2.5 * width, 'left\nloop', rotation=90, va='center', fontsize=16)
+        
     ax.annotate('', xy=(0.2, 1.05), xytext=(0, 1.05), xycoords='axes fraction', arrowprops=dict(arrowstyle='->', color='black'))
     ax.text(0.22, 1.05, 'cycling direction', rotation=0, va='center', ha='left', transform=ax.transAxes) 
     ax.text(0.75, 1.05, f'n={N}', rotation=0, va='center', ha='left', transform=ax.transAxes)     
-    
+    plt.savefig(f'figures/Figure_6_{site}_{direction}.png', dpi=300, bbox_inches='tight')
+
     plt.show()
     return   
 
@@ -417,7 +493,7 @@ def combine_sublane1m(list_locs, lim):
     
     N = len(df['flow'].values)
 
-    flow_direction_bins = range(0,2600,400)
+    flow_direction_bins = range(0,2880,480)
     df['flow_direction_bin'] = pd.cut(df['flow'], bins=flow_direction_bins, right=False)
     
     grouped = df.groupby('flow_direction_bin')
@@ -435,7 +511,7 @@ def combine_sublane1m(list_locs, lim):
 
     
 def heatmap_sublanes_densities(df, lim, label, N):
-
+    #Figure 7
     heatmap_data = df[['flow_direction_bin','D_sublane1', 'D_sublane2', 'D_sublane3', 'D_sublane4']]
     heatmap_data.set_index('flow_direction_bin', inplace=True)
     y_labs = []
@@ -446,27 +522,32 @@ def heatmap_sublanes_densities(df, lim, label, N):
     fig, ax = plt.subplots(figsize=(7, 4))
     norm = Normalize(vmin=0, vmax=lim)
     cax = ax.matshow(heatmap_data, cmap='jet', aspect='auto', norm=norm)
-    fig.colorbar(cax, label=label+r' $\overline{k_{sl}}$ [bicycles/km/m]')
+    if label == 'std. dev.':  
+        fig.colorbar(cax, label=label+r' $k_{sl}$ [bicycles/km/m]')
+    else:
+        fig.colorbar(cax, label='$\overline{k_{sl}}$ [bicycles/km/m]')
     
     # Set the labels
     ax.set_xticks([x + 0.48 for x in range(heatmap_data.shape[1])])
-    ax.set_xlabel('flow $\overline{q}$ [bicycles/h]')
+    ax.set_xlabel('$q$ [bicycles/h]')
     ax.invert_yaxis()
     ax.set_yticks([x + 0.48 for x in range(heatmap_data.shape[0])])
     ax.set_yticklabels([1,2,3,4])
     ax.set_xticklabels(y_labs)
-    ax.set_ylabel('width [m]')
+    ax.set_ylabel('distance from right edge [m]')
     ax.xaxis.set_ticks_position('bottom')
     ax.xaxis.set_label_position('bottom')
     
     ax.annotate('', xy=(0.2, 1.05), xytext=(0, 1.05), xycoords='axes fraction', arrowprops=dict(arrowstyle='->', color='black'))
     ax.text(0.22, 1.05, 'cycling direction', rotation=0, va='center', ha='left', transform=ax.transAxes)
     ax.text(0.75, 1.05, f'n={N}', rotation=0, va='center', ha='left', transform=ax.transAxes)   
+    plt.savefig(f'figures/Figure_7_{label}.png', dpi=300, bbox_inches='tight')
     plt.show()
     return 
 
 
-def lines_of_best_fit(df, values, label): 
+def lines_of_best_fit_flow_sublane(df, values): 
+    #Figure 8
     flow_dics = {values[0]:[],values[1]:[],values[2]:[],values[3]:[]}
     x_dics = {values[0]:[],values[1]:[],values[2]:[],values[3]:[]}
     y = []
@@ -482,14 +563,17 @@ def lines_of_best_fit(df, values, label):
             sublane_x = sublane_x[mask]
             y_new = y[mask]
             interpolation_function = interp1d(sublane_x, y_new, fill_value='extrapolate')
+            print(line_value)
             y_values.append(interpolation_function(line_value))
         flow_dics[line_value].extend(y_values)
         x_dics[line_value].extend([1,2,3])
     
+    print(flow_dics)
+    print(x_dics)
     marker_styles = ['o', 's', 'D', '^']
     line_styles = ['-', '--', '-.', ':']
     colors = ['midnightblue', 'darkorange', 'teal', "black"]
-    fig, ax = plt.subplots(figsize=(12, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
     for i, line_value in enumerate(values):
         x = np.array(x_dics[line_value])
         y = np.array(flow_dics[line_value])
@@ -506,13 +590,104 @@ def lines_of_best_fit(df, values, label):
     
     ax.set_yticks([0.5, 1, 2, 3, 4, 4.5])
     ax.set_yticklabels(['','1', '2', '3', '4', ''])
-    ax.set_xlim(-100, 5000)
-    ax.set_xlabel('flow $\overline{q}$ [bicycles/h]')
-    ax.set_ylabel('width [m]')
-    ax.legend(loc='center left', bbox_to_anchor=(1, 0.5), title=r'density $\overline{k_{sl}}$') # , bbox_to_anchor=(1, 0.5)
+    ax.set_xlim(-100, 4000)
+    ax.set_xlabel('$q$ [bicycles/h]')
+    ax.set_ylabel('distance from right edge [m]')
+    ax.legend(loc='lower right') 
     ax.annotate('', xy=(0.2, 1.05), xytext=(0, 1.05), xycoords='axes fraction', arrowprops=dict(arrowstyle='->', color='black'))
     ax.text(0.22, 1.05, 'cycling direction', rotation=0, va='center', ha='left', transform=ax.transAxes)
     ax.grid(True)
+    plt.savefig('figures/Figure_8.png', dpi=300, bbox_inches='tight')
+
+    plt.show()
+    return
+
+def lines_of_best_fit_flow_density(df, densities):
+    # Setup data structures to store values for each width
+    flow_dics = {density: [] for density in densities}
+    x_dics = {density: [] for density in densities}
+    y = []
+    
+    # Calculate midpoints of `flow_direction_bin` and store in `y`
+    for flow in df['flow_direction_bin'].unique():
+        y.append(get_midpoint(flow))
+    y = np.array(y)
+    
+    # Focus only on density columns for each sublane
+    df_sublanes = df[['D_sublane1', 'D_sublane2', 'D_sublane3', 'D_sublane4']]
+    
+    # Extract flow values for each density level on each sublane
+    for density in densities:
+        y_values = []
+        for lane in [1, 2, 3]:
+            # Extract data for the current sublane
+            sublane_x = np.array(df_sublanes[f'D_sublane{lane}'].values)
+            mask = ~np.isnan(sublane_x)
+            sublane_x = sublane_x[mask]
+            y_new = y[mask]
+            # Interpolate to find flow values for the given density
+            interpolation_function = interp1d(sublane_x, y_new, fill_value='extrapolate')
+            interpolated_values = interpolation_function(density)
+            y_values.append(interpolated_values)
+        
+        # Store the interpolated flow values and corresponding lane indices
+        flow_dics[density].extend(y_values)
+        x_dics[density].extend([1, 2, 3]) 
+       
+    # Plotting   
+    line_colors = ['#F08080', '#DC143C', '#4169E1', '#87CEEB']  # Crimson, Light Coral, Royal Blue, Sky Blue
+    segment_colors = ['#FFE4E1', '#FFB6C1', '#B0C4DE', '#B0E0E6']  # Light Crimson, Very Light Coral, Light Steel Blue, Powder Blue
+    
+    fig, ax = plt.subplots(figsize=(10, 6))
+    
+    # Store trendlines for each sublane
+    trendlines = []
+    
+    # Loop through each sublane to plot scatter points and trendlines
+    for i in range(3):  # Assuming three sublanes (1, 2, 3)
+        x = []
+        y = list(flow_dics.keys())  # Density levels as y-values
+        
+        # Gather flow values for the current sublane across densities
+        for density in densities:
+            x.append(flow_dics[density][i])
+        
+        # Fit and plot trendline
+        model = LinearRegression(fit_intercept=True)
+        model.fit(np.array(y).reshape(-1, 1), x)
+        trendline = model.predict(np.array(densities).reshape(-1, 1))
+        trendlines.append(trendline)
+        
+        if i == 2:
+            linewidth = 1.5
+        else:
+            linewidth = 0.75
+        ax.plot(trendline, np.array(densities).reshape(-1, 1), linewidth=linewidth, color=line_colors[i])
+
+    # Adding colored segments to indicate lane requirements between each pair of trendlines
+    densities_array = np.array(densities).reshape(-1, 1)
+    
+    ax.fill_betweenx(densities_array.flatten(), 0, trendlines[0], color=segment_colors[0], alpha=0.3, label='1 sublane')
+
+    for i in range(len(trendlines) - 1):
+        ax.fill_betweenx(densities_array.flatten(), trendlines[i], trendlines[i + 1],
+                         color=segment_colors[i+1], alpha=0.3, label=f'{i+2} sublanes')
+    
+    ax.fill_betweenx(densities_array.flatten(), trendlines[-1], 4000, color=segment_colors[-1], alpha=0.3, label='>3 sublanes')
+
+    # Legend, labels, and grid
+    ax.legend(loc='lower right')
+    ax.grid(True)
+    ax.set_xlim(-100, 4000)
+    ax.set_xlabel('$q$ [bicycles/h]')
+    ax.set_ylabel('$k_{max}$ [bicycles/km/m]')
+    ax.text(250, 30, "supply-oriented design", color='black',
+        bbox=dict(facecolor='white', edgecolor='black', boxstyle='square, pad=0.3'))
+    ax.text(2150, 25, "demand-oriented design", color='black',
+            bbox=dict(facecolor='white', edgecolor='black', boxstyle='square,pad=0.3'))
+
+    # Display and save the plot
+    plt.savefig('figures/Figure_9.png', dpi=300, bbox_inches='tight')
     plt.show()
     return
 

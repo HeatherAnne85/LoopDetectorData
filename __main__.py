@@ -5,9 +5,10 @@ file: run loop detector analysis
 author: Heather Kaths
 """
 
-import argparse
+
 import pandas as pd
 import LoopDetectorData as LDF
+import argparse
 
 
 # Parameters
@@ -25,12 +26,12 @@ def create_args():
                         help='Long and short labels for the sites.')
     parser.add_argument('--loop_info', default="./data/sites.csv",
                         help='information about the width and order of the inductive loops for each direction')  
-    parser.add_argument('--CDF_brandenburg/observations', default=True)      
-    parser.add_argument('--CDF_all_sites', default=True)  
-    parser.add_argument('--scatter_speed_flow', default=True)  
-    parser.add_argument('--scatter_density_flow', default=True)  
-    parser.add_argument('--site_heatmaps', default=True)  
-    parser.add_argument('--combined_heatmap', default=True)  
+    parser.add_argument('--CDF_brandenburg/observations', default=False)      
+    parser.add_argument('--CDF_all_sites', default=False)  
+    parser.add_argument('--scatter_speed_flow', default=False)  
+    parser.add_argument('--scatter_density_flow', default=False)  
+    parser.add_argument('--site_heatmaps', default=False)  
+    parser.add_argument('--combined_heatmap', default=False)  
     parser.add_argument('--line_of_best_fit', default=True)  
     parser.add_argument('--min_speed', default=6,
                         help='all speed recordings less than or equal to this value will be removed from the dataset'),
@@ -113,7 +114,8 @@ def run_analyses(data, config):
             LDF.heatmap_sublanes_densities(means, 70, 'mean', N)
             LDF.heatmap_sublanes_densities(stds, 30, "std. dev.", N)
         if config['line_of_best_fit']:
-            LDF.lines_of_best_fit(means, [10,20,30,40], r'density $\overline{k_l}$ [bicycles/km/m]')
+            LDF.lines_of_best_fit_flow_sublane(means, [10,20,30,40])
+            LDF.lines_of_best_fit_flow_density(means, [10,20,30,40])
     return
 
 def main():
